@@ -1,6 +1,0 @@
-node_modules/
-.env
-.idea/
-logs
-*.log
-logs/*
