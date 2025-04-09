@@ -1,11 +1,18 @@
 <script setup>
-import { defineProps } from 'vue';
-defineProps({
+import { defineProps, defineEmits } from 'vue';
+
+const props = defineProps({
   feedback: {
     type: Object,
     required: true
   }
 });
+
+const emit = defineEmits(['continue']);
+
+function handleContinue() {
+  emit('continue');
+}
 </script>
 
 <template>
@@ -15,6 +22,7 @@ defineProps({
       Score: {{ feedback.score }} / {{ feedback.totalPossible }}
       ({{ feedback.percentage }}%)
     </div>
+    <button @click="handleContinue" class="continue-btn">Continue to Next Challenge</button>
   </div>
 </template>
 
@@ -29,6 +37,20 @@ defineProps({
 
 .score {
   font-size: 24px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.continue-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.continue-btn:hover {
+  background-color: #45a049;
 }
 </style>

@@ -1,8 +1,8 @@
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { defineProps } from 'vue';
 import DataCard from './DataCard.vue';
 
-const props = defineProps({
+ defineProps({
   title: {
     type: String,
     required: true
@@ -20,20 +20,6 @@ const props = defineProps({
     default: null
   }
 });
-
-const emit = defineEmits(['update:data']);
-
-function updateItem(updatedItem) {
-  if (!props.editable) return;
-
-  const newData = [...props.data];
-  const index = newData.findIndex(item => item.id === updatedItem.id);
-
-  if (index !== -1) {
-    newData[index] = updatedItem;
-    emit('update:data', newData);
-  }
-}
 </script>
 
 <template>
@@ -46,7 +32,6 @@ function updateItem(updatedItem) {
         :index="index"
         :editable="editable"
         :feedback="feedback && feedback.results ? feedback.results[index] : null"
-        @update:item="updateItem"
     />
   </div>
 </template>
@@ -56,13 +41,6 @@ function updateItem(updatedItem) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-}
-
-h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  padding-bottom: 5px;
-  border-bottom: 1px solid #ddd;
+  gap: 20px;
 }
 </style>

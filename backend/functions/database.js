@@ -13,7 +13,7 @@ const db = new sqlite3.Database(dbPath);
  */
 function getAllChallenges() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT id FROM challenges", (err, rows) => {
+        db.all("SELECT id, name FROM challenges", (err, rows) => {
             if (err) {
                 reject(err);
             } else {
@@ -24,40 +24,98 @@ function getAllChallenges() {
 }
 
 /**
- * Get dirty data for a specific challenge
+ * Get dirty data for a specific challenge, filtering out empty columns
  */
 function getChallengeDirtyData(challengeId) {
     return new Promise((resolve, reject) => {
-        db.all(
-            "SELECT record_id as id, name, email, phone FROM dirty_data WHERE challenge_id = ?",
-            [challengeId],
-            (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
+        const query = `
+            SELECT record_id as id, * FROM dirty_data
+            WHERE challenge_id = ?
+            ORDER BY record_id`;
+
+        db.all(query, [challengeId], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                // If no rows, return empty array
+                if (rows.length === 0) {
+                    resolve([]);
+                    return;
                 }
+
+                // Identify columns that have at least one non-null value
+                const nonEmptyColumns = new Set(['id']);
+                rows.forEach(row => {
+                    Object.entries(row).forEach(([key, value]) => {
+                        if (value !== null && value !== undefined && value !== '' &&
+                            key !== 'challenge_id' && key !== 'record_id') {
+                            nonEmptyColumns.add(key);
+                        }
+                    });
+                });
+
+                // Filter rows to only include non-empty columns
+                const filteredRows = rows.map(row => {
+                    const filteredRow = { id: row.id };
+                    nonEmptyColumns.forEach(column => {
+                        if (column !== 'id') {
+                            filteredRow[column] = row[column];
+                        }
+                    });
+                    return filteredRow;
+                });
+
+                resolve(filteredRows);
             }
-        );
+        });
     });
 }
 
 /**
- * Get clean data for a specific challenge
+ * Get clean data for a specific challenge, filtering out empty columns
  */
 function getChallengeCleanData(challengeId) {
     return new Promise((resolve, reject) => {
-        db.all(
-            "SELECT record_id as id, name, email, phone FROM clean_data WHERE challenge_id = ?",
-            [challengeId],
-            (err, rows) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(rows);
+        const query = `
+            SELECT record_id as id, * FROM clean_data
+            WHERE challenge_id = ?
+            ORDER BY record_id`;
+
+        db.all(query, [challengeId], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                // If no rows, return empty array
+                if (rows.length === 0) {
+                    resolve([]);
+                    return;
                 }
+
+                // Identify columns that have at least one non-null value
+                const nonEmptyColumns = new Set(['id']);
+                rows.forEach(row => {
+                    Object.entries(row).forEach(([key, value]) => {
+                        if (value !== null && value !== undefined && value !== '' &&
+                            key !== 'challenge_id' && key !== 'record_id') {
+                            nonEmptyColumns.add(key);
+                        }
+                    });
+                });
+
+                // Filter rows to only include non-empty columns
+                const filteredRows = rows.map(row => {
+                    const filteredRow = { id: row.id };
+                    nonEmptyColumns.forEach(column => {
+                        if (column !== 'id') {
+                            filteredRow[column] = row[column];
+                        }
+                    });
+                    return filteredRow;
+                });
+
+                resolve(filteredRows);
             }
-        );
+        });
     });
 }
 
@@ -73,9 +131,9 @@ function createChallenges() {
             // Check if challenges already exist
             const existingChallenges = await getAllChallenges();
             if (existingChallenges.length > 0) {
-                console.log('Challenges already exist, skipping creation');
-                resolve();
-                return;
+                console.log('Challenges already exist, recreating all data...');
+                await dropTables();
+                await createTablesIfNotExist();
             }
 
             // Add challenges
@@ -95,6 +153,34 @@ function createChallenges() {
 }
 
 /**
+ * Drop existing tables for clean recreation
+ */
+function dropTables() {
+    return new Promise((resolve, reject) => {
+        db.run(`DROP TABLE IF EXISTS clean_data`, (err) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            db.run(`DROP TABLE IF EXISTS dirty_data`, (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                db.run(`DROP TABLE IF EXISTS challenges`, (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        console.log('Tables dropped successfully');
+                        resolve();
+                    }
+                });
+            });
+        });
+    });
+}
+
+/**
  * Create database tables if they don't exist
  */
 function createTablesIfNotExist() {
@@ -102,10 +188,10 @@ function createTablesIfNotExist() {
         // Create challenges table
         db.run(`
             CREATE TABLE IF NOT EXISTS challenges (
-                id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL,
-                difficulty TEXT NOT NULL,
-                description TEXT NOT NULL
+                                                      id INTEGER PRIMARY KEY,
+                                                      name TEXT NOT NULL,
+                                                      difficulty TEXT NOT NULL,
+                                                      description TEXT NOT NULL
             )
         `, (err) => {
             if (err) {
@@ -113,44 +199,86 @@ function createTablesIfNotExist() {
                 return;
             }
 
-            // Create clean_data table
+            // Create clean_data table with expanded fields
             db.run(`
                 CREATE TABLE IF NOT EXISTS clean_data (
-                    record_id INTEGER,
-                    challenge_id INTEGER,
-                    name TEXT,
-                    email TEXT,
-                    phone TEXT,
-                    address TEXT,
-                    city TEXT,
-                    postal_code TEXT,
-                    date TEXT,
-                    number INTEGER,
-                    PRIMARY KEY (record_id, challenge_id),
+                                                          record_id INTEGER,
+                                                          challenge_id INTEGER,
+                                                          name TEXT,
+                                                          email TEXT,
+                                                          phone TEXT,
+                                                          voornaam TEXT,
+                                                          achternaam TEXT,
+                                                          volledigenaam TEXT,
+                                                          adres TEXT,
+                                                          straat TEXT,
+                                                          woonplaats TEXT,
+                                                          stad TEXT,
+                                                          land TEXT,
+                                                          leeftijd INTEGER,
+                                                          prijs REAL,
+                                                          klantid TEXT,
+                                                          productcode TEXT,
+                                                          postcode TEXT,
+                                                          geboortedatum TEXT,
+                                                          gewicht_kg REAL,
+                                                          telefoonnummer TEXT,
+                                                          telefoonmobiel TEXT,
+                                                          telefoonvast TEXT,
+                                                          netnummer TEXT,
+                                                          actief INTEGER,
+                                                          nieuwsbrief INTEGER,
+                                                          productid TEXT,
+                                                          prijsperstuk REAL,
+                                                          aantal INTEGER,
+                                                          totaalprijs REAL,
+                                                          contactpersoon TEXT,
+                                                          PRIMARY KEY (record_id, challenge_id),
                     FOREIGN KEY (challenge_id) REFERENCES challenges (id)
-                )
+                    )
             `, (err) => {
                 if (err) {
                     reject(err);
                     return;
                 }
 
-                // Create dirty_data table
+                // Create dirty_data table with expanded fields
                 db.run(`
                     CREATE TABLE IF NOT EXISTS dirty_data (
-                        record_id INTEGER,
-                        challenge_id INTEGER,
-                        name TEXT,
-                        email TEXT,
-                        phone TEXT,
-                        address TEXT,
-                        city TEXT,
-                        postal_code TEXT,
-                        date TEXT,
-                        number INTEGER,
-                        PRIMARY KEY (record_id, challenge_id),
+                                                              record_id INTEGER,
+                                                              challenge_id INTEGER,
+                                                              name TEXT,
+                                                              email TEXT,
+                                                              phone TEXT,
+                                                              voornaam TEXT,
+                                                              achternaam TEXT,
+                                                              volledigenaam TEXT,
+                                                              adres TEXT,
+                                                              straat TEXT,
+                                                              woonplaats TEXT,
+                                                              stad TEXT,
+                                                              land TEXT,
+                                                              leeftijd TEXT,
+                                                              prijs TEXT,
+                                                              klantid TEXT,
+                                                              productcode TEXT,
+                                                              postcode TEXT,
+                                                              geboortedatum TEXT,
+                                                              gewicht_kg TEXT,
+                                                              telefoonnummer TEXT,
+                                                              telefoonmobiel TEXT,
+                                                              telefoonvast TEXT,
+                                                              netnummer TEXT,
+                                                              actief TEXT,
+                                                              nieuwsbrief TEXT,
+                                                              productid TEXT,
+                                                              prijsperstuk REAL,
+                                                              aantal REAL,
+                                                              totaalprijs TEXT,
+                                                              contactpersoon TEXT,
+                                                              PRIMARY KEY (record_id, challenge_id),
                         FOREIGN KEY (challenge_id) REFERENCES challenges (id)
-                    )
+                        )
                 `, (err) => {
                     if (err) {
                         reject(err);
@@ -160,12 +288,10 @@ function createTablesIfNotExist() {
                     // Create highscores table if it doesn't exist
                     db.run(`
                         CREATE TABLE IF NOT EXISTS highscores (
-                            id INTEGER PRIMARY KEY AUTOINCREMENT,
-                            name TEXT NOT NULL,
-                            score INTEGER NOT NULL,
-                            challenge_id INTEGER,
-                            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                            FOREIGN KEY (challenge_id) REFERENCES challenges (id)
+                                                                  id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                                                  name TEXT NOT NULL,
+                                                                  score INTEGER NOT NULL,
+                                                                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
                         )
                     `, (err) => {
                         if (err) {
@@ -205,7 +331,7 @@ function insertData(table, record_id, challenge_id, data) {
         const values = Object.values(data);
 
         db.run(
-            `INSERT INTO ${table} (record_id, challenge_id, ${columns.join(', ')}) 
+            `INSERT INTO ${table} (record_id, challenge_id, ${columns.join(', ')})
              VALUES (?, ?, ${placeholders})`,
             [record_id, challenge_id, ...values],
             function(err) {
@@ -219,31 +345,31 @@ function insertData(table, record_id, challenge_id, data) {
     });
 }
 
-// Challenge 1: Data validity (Easy)
+// Challenge 1: Data Validity (Email and Name corrections)
 async function addChallenge1() {
     const challengeId = 1;
-    const name = "Text Correction";
+    const name = "Data Validity";
     const difficulty = "Easy";
-    const description = "Fix simple text errors like spelling mistakes and basic factual errors";
+    const description = "Fix simple text errors like spelling mistakes in names and email addresses";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
     // Clean data
     const cleanData = [
-        { name: "John Smith", email: "john.smith@example.com", phone: "555-123-4567" },
-        { name: "Sarah Johnson", email: "sarah.j@company.com", phone: "555-987-6543" },
-        { name: "Robert Williams", email: "rob.williams@mail.org", phone: "555-246-8135" },
-        { name: "Lisa Brown", email: "lisa.brown@example.net", phone: "555-369-1478" },
-        { name: "Michael Davis", email: "michael.davis@company.org", phone: "555-159-7531" }
+        { name: "Jan Janssen", email: "jan.j@hotmail.com", phone: "0612345678" },
+        { name: "Maria de Vries", email: "maria.vries@gmail.com", phone: "06-87654321" },
+        { name: "Pieter Pietersen", email: "p.pietersen@bedrijf.nl", phone: "0698765432" },
+        { name: "Annelies Bakker", email: "a.bakker@provider.net", phone: "06 11223344" },
+        { name: "Mohammed Benali", email: "m.benali@yahoo.com", phone: "0655667788" }
     ];
 
     // Dirty data with spelling mistakes and errors
     const dirtyData = [
-        { name: "Jhon Smtih", email: "john.smith@exapmle.com", phone: "555-123-4567" },
-        { name: "Sara Jonson", email: "sarah.j@comapny.com", phone: "555-978-6543" },
-        { name: "Robrt Willaims", email: "rob.williams@mail.org", phone: "555-246-8135" },
-        { name: "Liza Brown", email: "lisa.brown@example.ent", phone: "555-369-1478" },
-        { name: "Micheal Davsi", email: "michael.davis@company.org", phone: "555-195-7531" }
+        { name: "Jan Jnsen", email: "jan.j@hotmal.com", phone: "0612345678" },
+        { name: "Maria de Vreis", email: "maria.vreis@gmil.com", phone: "06-87654321" },
+        { name: "Piter Pietersen", email: "p.pietersen@bedirjf.nl", phone: "069875432" },
+        { name: "Annelies Bakker", email: "a.bakker@providr.net", phone: "06 11223344" },
+        { name: "Mohammed Benali", email: "m.benali@yaho.com", phone: "0655667789" }
     ];
 
     // Insert data
@@ -253,31 +379,29 @@ async function addChallenge1() {
     }
 }
 
-// Challenge 2: Data Type Validation (Easy/Medium)
+// Challenge 2: Data Type Validation
 async function addChallenge2() {
     const challengeId = 2;
-    const name = "Type Correction";
-    const difficulty = "Easy/Medium";
-    const description = "Convert textual numbers and dates to their proper formats";
+    const name = "Data Type Validation";
+    const difficulty = "Medium";
+    const description = "Convert text values to their proper data types";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
-    // Clean data
     const cleanData = [
-        { name: "Product A", number: 12, date: "2023-05-15" },
-        { name: "Product B", number: 25, date: "2023-06-20" },
-        { name: "Product C", number: 8, date: "2023-04-10" },
-        { name: "Product D", number: 30, date: "2023-07-05" },
-        { name: "Product E", number: 15, date: "2023-03-25" }
+        { leeftijd: 12 },
+        { prijs: 19.95 },
+        { klantid: "1138", productcode: "A4-XYZ" },
+        { postcode: "1234 AB" },
+        { geboortedatum: "17-04-1990", gewicht_kg: 75.5 }
     ];
 
-    // Dirty data with text instead of numbers
     const dirtyData = [
-        { name: "Product A", number: "Twelve", date: "May 15, 2023" },
-        { name: "Product B", number: "Twenty-five", date: "20/06/2023" },
-        { name: "Product C", number: "Eight", date: "10th April 2023" },
-        { name: "Product D", number: "Thirty", date: "July 5th, 2023" },
-        { name: "Product E", number: "Fifteen", date: "25-03-2023" }
+        { leeftijd: "Twaalf" },
+        { prijs: "€ 19,95" },
+        { klantid: "K1138", productcode: "4" },
+        { postcode: "1234 AB " },
+        { geboortedatum: "1990-04-17", gewicht_kg: "75,5 kg" }
     ];
 
     // Insert data
@@ -287,102 +411,93 @@ async function addChallenge2() {
     }
 }
 
-// Challenge 3: Data standardization (Medium)
+// Challenge 3: Data Standardization
 async function addChallenge3() {
     const challengeId = 3;
     const name = "Data Standardization";
     const difficulty = "Medium";
-    const description = "Standardize data formats such as dates and ensure proper capitalization";
+    const description = "Standardize data formats like capitalization and country codes";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
-    // Clean data
     const cleanData = [
-        { name: "John Doe", email: "john.doe@example.com", date: "2023-08-15" },
-        { name: "Jane Smith", email: "jane.smith@company.org", date: "2023-09-22" },
-        { name: "Robert Johnson", email: "robert.johnson@mail.net", date: "2023-07-10" },
-        { name: "Emily Davis", email: "emily.davis@example.com", date: "2023-10-05" },
-        { name: "Michael Wilson", email: "michael.wilson@company.org", date: "2023-06-30" }
+        { voornaam: "Jan", achternaam: "de Vries" },
+        { name: "Piet Janssen" },
+        { land: "NL" },
+        { telefoonmobiel: "+31611223344", telefoonvast: "+31105551212" },
+        { actief: 1, nieuwsbrief: 0 }
     ];
 
-    // Dirty data with inconsistent capitalization and date formats
     const dirtyData = [
-        { name: "john doe", email: "JOHN.DOE@EXAMPLE.COM", date: "15-08-2023" },
-        { name: "JANE SMITH", email: "jane.smith@company.org", date: "22/09/2023" },
-        { name: "Robert johnson", email: "ROBERT.JOHNSON@mail.net", date: "10.07.2023" },
-        { name: "emily DAVIS", email: "Emily.Davis@Example.com", date: "05-10-2023" },
-        { name: "MICHAEL wilson", email: "michael.wilson@COMPANY.org", date: "30/06/2023" }
+        { voornaam: "jan", achternaam: "DE VRIES" },
+        { name: "PIET JANSSEN" },
+        { land: "Nederland" },
+        { telefoonmobiel: "06-11223344", telefoonvast: "010-555 12 12" },
+        { actief: "TRUE", nieuwsbrief: "Nee" }
     ];
 
-    // Insert data
     for (let i = 0; i < cleanData.length; i++) {
         await insertData('clean_data', i + 1, challengeId, cleanData[i]);
         await insertData('dirty_data', i + 1, challengeId, dirtyData[i]);
     }
 }
 
-// Challenge 4: Missing Data Handling (Medium/Hard)
+// Challenge 4: Missing Data Handling
 async function addChallenge4() {
     const challengeId = 4;
     const name = "Missing Data Handling";
-    const difficulty = "Medium/Hard";
-    const description = "Fill in missing fields based on context or mark them appropriately";
+    const difficulty = "Hard";
+    const description = "Fill in missing fields based on context";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
-    // Clean data
     const cleanData = [
-        { name: "John Smith", email: "john@example.com", city: "New York", postal_code: "10001" },
-        { name: "Maria Garcia", email: "maria@company.org", city: "Los Angeles", postal_code: "90001" },
-        { name: "James Johnson", email: "james@mail.net", city: "Chicago", postal_code: "60007" },
-        { name: "Emily Wilson", email: "emily@example.com", city: "Houston", postal_code: "77001" },
-        { name: "Robert Brown", email: "robert@company.org", city: "Phoenix", postal_code: "85001" }
+        { voornaam: "Fatima", achternaam: "Yilmaz", volledigenaam: "Fatima Yilmaz" },
+        { straat: "Dorpsstraat 1", postcode: "1234 AB", woonplaats: "Dorpshuizen", land: "NL" },
+        { postcode: "3011 AC", woonplaats: "Rotterdam" },
+        { telefoonnummer: "+31101234567", netnummer: "010" },
+        { productid: "XYZ", prijsperstuk: 15.50, aantal: 4, totaalprijs: 62.00 }
     ];
 
-    // Dirty data with missing fields
     const dirtyData = [
-        { name: "John Smith", email: "john@example.com", city: "", postal_code: "10001" },
-        { name: "Maria Garcia", email: "", city: "Los Angeles", postal_code: "90001" },
-        { name: "James Johnson", email: "james@mail.net", city: "Chicago", postal_code: "" },
-        { name: "", email: "emily@example.com", city: "Houston", postal_code: "77001" },
-        { name: "Robert Brown", email: "robert@company.org", city: "", postal_code: "" }
+        { voornaam: "Fatima", achternaam: "Yilmaz", volledigenaam: null },
+        { straat: "Dorpsstraat 1", postcode: "1234 AB", woonplaats: "Dorpshuizen", land: null },
+        { postcode: "3011 AC", woonplaats: null },
+        { telefoonnummer: "+31101234567", netnummer: null },
+        { productid: "XYZ", prijsperstuk: 15.50, aantal: 4, totaalprijs: null }
     ];
 
-    // Insert data
     for (let i = 0; i < cleanData.length; i++) {
         await insertData('clean_data', i + 1, challengeId, cleanData[i]);
         await insertData('dirty_data', i + 1, challengeId, dirtyData[i]);
     }
 }
 
-// Challenge 5: Structural Validation (Hard)
+// Challenge 5: Structural Validation
 async function addChallenge5() {
     const challengeId = 5;
     const name = "Structural Validation";
     const difficulty = "Hard";
-    const description = "Fix data with structural problems like inconsistent formatting in addresses and phone numbers";
+    const description = "Fix data with structural problems like swapped fields";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
-    // Clean data
     const cleanData = [
-        { name: "Thomas Wright", phone: "555-123-4567", address: "123 Main St, Apt 4B" },
-        { name: "Sophia Lee", phone: "555-234-5678", address: "456 Oak Ave, Suite 7C" },
-        { name: "Alexander Kim", phone: "555-345-6789", address: "789 Pine Rd, Unit 10D" },
-        { name: "Isabella Martinez", phone: "555-456-7890", address: "321 Cedar Ln, #15" },
-        { name: "William Chen", phone: "555-567-8901", address: "654 Maple Dr, Apt 22" }
+        { voornaam: "Willem", achternaam: "de Boer", email: "w.deboer@mail.com" },
+        { adres: "Damrak 1", postcode: "1011 AA", woonplaats: "Amsterdam", phone: "+31698765432" },
+        { klantid: "5678", stad: "Brussel", land: "BE" },
+        { name: "Stichting Voorbeeld", email: "info@company.org", contactpersoon: "Mevr. Jansen" },
+        { productid: "PROD-001", aantal: 3, prijsperstuk: 49.95 }
     ];
 
-    // Dirty data with structural problems
     const dirtyData = [
-        { name: "Thomas Wright", phone: "5551234567", address: "123MainStApt4B" },
-        { name: "Sophia Lee", phone: "(555) 234-5678", address: "456, Oak Avenue, Suite 7C" },
-        { name: "Alexander Kim", phone: "555.345.6789", address: "789 Pine Road Unit 10D" },
-        { name: "Isabella Martinez", phone: "555 456 7890", address: "321 Cedar Lane #15" },
-        { name: "William Chen", phone: "+1-555-567-8901", address: "654 Maple Drive, Apartment 22" }
+        { voornaam: "de Boer", achternaam: "Willem", email: "w.deboer@mail.com" },
+        { adres: "+31698765432", postcode: "1011 AA", woonplaats: "Amsterdam", phone: "Damrak 1" },
+        { klantid: "5678", stad: "België", land: "Brussel" },
+        { name: "info@company.org", email: "Stichting Voorbeeld", contactpersoon: "Mevr. Jansen" },
+        { productid: "PROD-001", aantal: 49.95, prijsperstuk: 3 }
     ];
 
-    // Insert data
     for (let i = 0; i < cleanData.length; i++) {
         await insertData('clean_data', i + 1, challengeId, cleanData[i]);
         await insertData('dirty_data', i + 1, challengeId, dirtyData[i]);
@@ -394,12 +509,32 @@ async function addChallenge5() {
  */
 function getHighScores() {
     return new Promise((resolve, reject) => {
-        db.all("SELECT * FROM highscores ORDER BY score DESC LIMIT 5", (err, rows) => {
+        db.all("SELECT * FROM highscores ORDER BY score DESC LIMIT 10", (err, rows) => {
             if (err) {
                 reject(err);
                 return;
             }
             resolve(rows);
+        });
+    });
+}
+
+/**
+ * insert high score
+ */
+function insertHighScore(name, score) {
+    return new Promise((resolve, reject) => {
+        const query = `
+            INSERT INTO highscores (name, score)
+            VALUES (?, ?)
+        `;
+
+        db.run(query, [name, score], function(err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(this.lastID);
+            }
         });
     });
 }
@@ -419,7 +554,6 @@ function closeDatabase() {
     });
 }
 
-
 // ========= Exports =========
 module.exports = {
     db,
@@ -428,6 +562,7 @@ module.exports = {
     getChallengeDirtyData,
     getChallengeCleanData,
     getHighScores,
+    insertHighScore,
     closeDatabase,
     createChallenges,
     createTablesIfNotExist,
@@ -437,5 +572,6 @@ module.exports = {
     addChallenge2,
     addChallenge3,
     addChallenge4,
-    addChallenge5
+    addChallenge5,
+    dropTables
 };

@@ -11,6 +11,7 @@ const {
     getChallengeDirtyData,
     getChallengeCleanData,
     getHighScores,
+    insertHighScore,
     closeDatabase,
     createChallenges,
     createTablesIfNotExist,
@@ -109,6 +110,26 @@ app.get('/api/highscores/', async (req, res) => {
     try {
         const highscores = await getHighScores();
         res.json(highscores);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Database error" });
+    }
+});
+
+app.post('/api/highscores/', async (req, res) => {
+    try {
+        const { name, score } = req.body;
+
+        if (!name || score === undefined) {
+            return res.status(400).json({ error: "Name and score are required" });
+        }
+
+        const highscoreId = await insertHighScore(name, score || null);
+        res.status(201).json({
+            success: true,
+            message: "Highscore added successfully",
+            id: highscoreId
+        });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: "Database error" });

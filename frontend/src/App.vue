@@ -1,20 +1,40 @@
-<!-- ==== Script ==== -->
 <script setup>
-import { ref, onMounted,} from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
-import ChallengeSelector from './components/ChallengeSelector.vue';
 import ChallengeGame from './components/ChallengeGame.vue';
 import HighScores from "./components/HighScores.vue";
+import GameScoreSubmission from "./components/GameScoreSubmission.vue";
 
 // Constants
 const API_URL = process.env.VUE_APP_API_URL
 
 // Reactive state
 const availableChallenges = ref([]);
+const currentChallengeIndex = ref(0);
 const currentChallenge = ref(null);
 const userCleanedData = ref([]);
 const feedback = ref(null);
 const showHighScores = ref(false);
+const showScoreSubmission = ref(false);
+const gameInProgress = ref(false);
+const gameCompleted = ref(false);
+const finalScore = ref(0);
+const challengeScores = ref({});
+const gameScore = ref(0);
+
+// Computed
+const currentGameNumber = computed(() => {
+  if (!gameInProgress.value) return 0;
+  return currentChallengeIndex.value + 1;
+});
+
+const totalGames = computed(() => {
+  return availableChallenges.value.length;
+});
+
+const totalScore = computed(() => {
+  return Object.values(challengeScores.value).reduce((sum, score) => sum + score, 0);
+});
 
 // Functions
 async function fetchChallenges() {
@@ -26,9 +46,21 @@ async function fetchChallenges() {
   }
 }
 
-async function loadChallenge(id) {
+async function startGame() {
+  currentChallengeIndex.value = 0;
+  gameInProgress.value = true;
+  gameCompleted.value = false;
+  showScoreSubmission.value = false;
+  challengeScores.value = {}; // Reset challenge scores
+  gameScore.value = 0; // Reset game score
+  finalScore.value = 0; // Reset final score
+  await loadCurrentChallenge();
+}
+
+async function loadCurrentChallenge() {
   try {
-    const response = await axios.get(`${API_URL}/challenge/${id}`);
+    const challengeId = availableChallenges.value[currentChallengeIndex.value].id;
+    const response = await axios.get(`${API_URL}/challenge/${challengeId}`);
     currentChallenge.value = response.data;
     // Create a copy of the dirty data for user edits
     userCleanedData.value = JSON.parse(JSON.stringify(currentChallenge.value.dirtyData));
@@ -38,32 +70,122 @@ async function loadChallenge(id) {
   }
 }
 
-async function submitData() {
+async function submitData(recordIndex) {
   try {
+    // If recordIndex is provided, create a payload with just that record
+    const dataToSubmit = recordIndex !== undefined
+        ? { cleanedData: [userCleanedData.value[recordIndex]] }
+        : { cleanedData: userCleanedData.value };
+
     const response = await axios.post(
         `${API_URL}/challenge/${currentChallenge.value.id}/submit`,
-        { cleanedData: userCleanedData.value }
+        dataToSubmit
     );
     feedback.value = response.data;
+
+    // Calculate and store score for this challenge
+    if (feedback.value) {
+      const challengeId = currentChallenge.value.id;
+      challengeScores.value[challengeId] = calculateChallengeScore(feedback.value);
+
+      // Update the final game score
+      gameScore.value = totalScore.value;
+    }
+
+    console.log(feedback.value);
   } catch (error) {
     console.error('Error submitting data:', error);
   }
 }
 
-function resetChallenge() {
+function calculateChallengeScore(feedback) {
+  if (!feedback || !feedback.results) {
+    return 0;
+  }
+
+  // Base score calculation - 20 points per correct record
+  const basePoints = 90;
+
+  // Penalty per error in a record
+  const errorPenalty = 30;
+
+  const totalScore = feedback.results.reduce((sum, result, index) => {
+
+    // Base points for the record
+    let recordScore = basePoints;
+
+    // Subtract points for errors
+    if (!result.correct && result.errors) {
+      const errorCount = result.errors.length;
+      const totalPenalty = errorCount * errorPenalty;
+      recordScore = Math.max(0, recordScore - totalPenalty);
+      console.log(`Record score after penalty: ${recordScore}`);
+    } else if (result.correct) {
+      console.log('Record is correct, no penalties applied');
+    }
+
+    const newSum = sum + recordScore;
+    console.log(`Adding ${recordScore} to running total. New sum: ${newSum}`);
+    return newSum;
+  }, 0);
+
+  console.log('Final challenge score calculated:', totalScore);
+  return totalScore;
+}
+
+function advanceToNextGame() {
+  currentChallengeIndex.value++;
+  feedback.value = null; // Reset feedback when moving to next challenge
+
+  // If we've completed all challenges
+  if (currentChallengeIndex.value >= availableChallenges.value.length) {
+    gameInProgress.value = false;
+    gameCompleted.value = true;
+    currentChallenge.value = null;
+    showScoreSubmission.value = true;
+    finalScore.value = gameScore.value; // Set the final score
+    return;
+  }
+
+  // Load the next challenge
+  loadCurrentChallenge();
+}
+
+function resetChallenge(recordIndex) {
   if (currentChallenge.value) {
-    userCleanedData.value = JSON.parse(JSON.stringify(currentChallenge.value.dirtyData));
+    if (recordIndex !== undefined) {
+      // Reset only the specific record
+      userCleanedData.value[recordIndex] = JSON.parse(
+          JSON.stringify(currentChallenge.value.dirtyData[recordIndex])
+      );
+    } else {
+      // Reset all records
+      userCleanedData.value = JSON.parse(
+          JSON.stringify(currentChallenge.value.dirtyData)
+      );
+    }
     feedback.value = null;
   }
 }
 
 function showHighScoresScreen() {
   showHighScores.value = true;
+  showScoreSubmission.value = false;
 }
 
 function backToMenu() {
   currentChallenge.value = null;
   showHighScores.value = false;
+  showScoreSubmission.value = false;
+  gameInProgress.value = false;
+}
+
+function updateUserData(updatedData) {
+  userCleanedData.value = updatedData;
+}
+
+function updateFinalScore(score) {
+  finalScore.value = score;
 }
 
 onMounted(() => {
@@ -74,7 +196,7 @@ onMounted(() => {
 <!-- ==== Template ==== -->
 <template>
   <div id="app">
-    <div>
+    <div class="topBorder">
       <div class="imageTopRight">
         <img src="" alt="logo-zuyd"/>
       </div>
@@ -83,7 +205,7 @@ onMounted(() => {
       <div class="secondTopBorder">
       </div>
     </div>
-    <div v-if="!currentChallenge && !showHighScores">
+    <div v-if="!currentChallenge && !showHighScores && !showScoreSubmission">
       <div class="headers">
         <h3><i>Lectoraat Data intelligence en ICT-Academie in samenwerking met</i></h3>
         <hr/>
@@ -91,11 +213,10 @@ onMounted(() => {
         <h1>Data Cleaning - ID Game</h1>
       </div>
       <div class="buttons">
-        <ChallengeSelector
-            :challenges="availableChallenges"
-            @select-challenge="loadChallenge"
-        />
-        <button @click="showHighScoresScreen">High Scores</button>
+        <div class="start-game-container">
+          <button @click="startGame" class="start-game-btn">Start Game</button>
+          <button @click="showHighScoresScreen" class="high-scores-btn">High Scores</button>
+        </div>
       </div>
     </div>
     <ChallengeGame
@@ -103,9 +224,21 @@ onMounted(() => {
         :currentChallenge="currentChallenge"
         :userCleanedData="userCleanedData"
         :feedback="feedback"
+        :gameNumber="currentGameNumber"
+        :totalGames="totalGames"
         @submit="submitData"
         @reset="resetChallenge"
         @back-to-menu="backToMenu"
+        @continue="advanceToNextGame"
+        @update:userCleanedData="updateUserData"
+        @update:finalScore="updateFinalScore"
+    />
+    <GameScoreSubmission
+        v-else-if="showScoreSubmission"
+        :totalScore="finalScore"
+        :apiUrl="API_URL"
+        @back-to-menu="backToMenu"
+        @play-again="startGame"
     />
     <HighScores
         v-else-if="showHighScores"

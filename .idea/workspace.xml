@@ -4,8 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="68b808dc-e226-4f2d-be6d-243e43864c1a" name="Changes" comment="" />
-    <list id="5e465405-c57c-42b4-8311-2a78feb554c4" name="Changes by bosje" comment="" />
+    <list default="true" id="68b808dc-e226-4f2d-be6d-243e43864c1a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/functions/database.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/functions/database.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ChallengeGame.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ChallengeGame.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ChallengeSelector.vue" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/DataCard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/DataCard.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/DataColumn.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/DataColumn.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/ResultsFeedback.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ResultsFeedback.vue" afterDir="false" />
+    </list>
+    <list id="5e465405-c57c-42b4-8311-2a78feb554c4" name="Changes by bosje" comment="">
+      <change beforePath="$PROJECT_DIR$/backend/server.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/server.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/App.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/App.vue" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,13 +26,41 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Vue Composition API Component" />
         <option value="JavaScript File" />
+        <option value="Vue Composition API Component" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/frontend/src/App.vue">
+      <ranges>
+        <range start1="0" end1="1" start2="0" end2="0" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="2" end1="3" start2="1" end2="2" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="4" end1="5" start2="3" end2="3" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="7" end1="7" start2="5" end2="6" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="13" end1="13" start2="12" end2="13" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="17" end1="17" start2="17" end2="37" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="28" end1="29" start2="48" end2="60" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="30" end1="31" start2="61" end2="63" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="40" end1="41" start2="72" end2="73" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="42" end1="42" start2="74" end2="79" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="44" end1="45" start2="81" end2="82" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="47" end1="47" start2="84" end2="95" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="51" end1="51" start2="99" end2="134" changelist="5e465405-c57c-42b4-8311-2a78feb554c4" />
+        <range start1="52" end1="53" start2="135" end2="154" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="54" end1="55" start2="155" end2="166" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="61" end1="61" start2="172" end2="173" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="66" end1="66" start2="178" end2="188" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="76" end1="77" start2="198" end2="199" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="85" end1="86" start2="207" end2="208" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="93" end1="98" start2="215" end2="219" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="105" end1="105" start2="226" end2="228" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+        <range start1="108" end1="108" start2="231" end2="241" changelist="68b808dc-e226-4f2d-be6d-243e43864c1a" />
+      </ranges>
+    </file>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6
@@ -30,36 +70,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Node.js.index.js.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
-    "javascript.nodejs.core.library.configured.version": "22.14.0",
-    "javascript.nodejs.core.library.typings.version": "22.14.0",
-    "last_opened_file_path": "C:/Users/djody/Documents/GitHub/ChatGPTeam_Innovate_Demonstrator",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "node",
-    "nodejs_package_manager_path": "npm",
-    "npm.test.executor": "Run",
-    "settings.editor.selected.configurable": "preferences.keymap",
-    "ts.external.directory.path": "C:\\Users\\djody\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Node.js.index.js.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;22.14.0&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;22.14.0&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/djody/Documents/GitHub/ChatGPTeam_Innovate_Demonstrator&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.test.executor&quot;: &quot;Run&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\djody\\AppData\\Local\\Programs\\WebStorm\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "vue.recent.templates": [
-      "Vue Composition API Component"
+  &quot;keyToStringList&quot;: {
+    &quot;vue.recent.templates&quot;: [
+      &quot;Vue Composition API Component&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\djody\Documents\GitHub\ChatGPTeam_Innovate_Demonstrator\frontend\src\components" />
       <recent name="C:\Users\djody\Documents\GitHub\ChatGPTeam_Innovate_Demonstrator\frontend" />
     </key>
   </component>
@@ -103,6 +144,8 @@
       <workItem from="1744022971758" duration="1368000" />
       <workItem from="1744025514569" duration="693000" />
       <workItem from="1744026220519" duration="10617000" />
+      <workItem from="1744105842026" duration="18847000" />
+      <workItem from="1744195304842" duration="527000" />
     </task>
     <servers />
   </component>
@@ -113,10 +156,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/backend/server.js</url>
-          <line>9</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="17" />
+          <url>file://$PROJECT_DIR$/frontend/src/components/ChallengeGame.vue</url>
+          <line>222</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
