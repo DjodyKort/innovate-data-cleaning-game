@@ -119,6 +119,19 @@ function getChallengeCleanData(challengeId) {
     });
 }
 
+/** Get the challenge data by ID */
+function getChallengeDataById(challengeId) {
+    return new Promise((resolve, reject) => {
+        db.get("SELECT * FROM challenges WHERE id = ?", [challengeId], (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row);
+            }
+        });
+    });
+}
+
 /**
  * Create challenges with clean and dirty data
  */
@@ -561,6 +574,7 @@ module.exports = {
     getAllChallenges,
     getChallengeDirtyData,
     getChallengeCleanData,
+    getChallengeDataById,
     getHighScores,
     insertHighScore,
     closeDatabase,

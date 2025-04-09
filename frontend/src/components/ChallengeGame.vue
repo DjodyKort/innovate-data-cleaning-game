@@ -1,8 +1,52 @@
 <script setup>
+// ==== Imports ====
 import { defineProps, defineEmits, ref, computed, watch } from 'vue';
 import DataColumn from './DataColumn.vue';
 import ResultsFeedback from './ResultsFeedback.vue';
 
+// ==== Functions ====
+function handleSubmit() {
+  emit('submit');// Don't pass the index parameter to submit all records
+}
+
+function handleReset() {
+  emit('reset', currentRecordIndex.value);
+}
+
+function backTomMenu() {
+  emit('back-to-menu');
+}
+
+function handleNextChallenge() {
+  emit('continue');
+}
+
+function handleNext() {
+  if (currentRecordIndex.value < totalRecords.value - 1) {
+    currentRecordIndex.value++;
+  } else if (props.feedback && props.feedback.success) {
+    handleNextChallenge();
+  }
+}
+
+function handlePrevious() {
+  if (currentRecordIndex.value > 0) {
+    currentRecordIndex.value--;
+  }
+}
+
+function updateUserData(newData) {
+  if (!newData || newData.length === 0 || !props.userCleanedData) return;
+
+  // Copy the updated item back to the full array
+  const updatedData = [...props.userCleanedData];
+  if (currentRecordIndex.value < updatedData.length && newData[0]) {
+    updatedData[currentRecordIndex.value] = newData[0];
+    emit('update:userCleanedData', updatedData);
+  }
+}
+
+// ==== Declaring Variables ====
 const props = defineProps({
   currentChallenge: {
     type: Object,
@@ -66,6 +110,7 @@ const currentFeedback = computed(() => {
   return filteredFeedback;
 });
 
+// ==== Watchers ====
 // Update the challenge score when feedback changes
 watch(
     () => props.feedback,
@@ -88,46 +133,9 @@ watch(
     }
 );
 
-function handleSubmit() {
-  emit('submit');// Don't pass the index parameter to submit all records
-}
+// ==== Start of Component ====
+console.log('Current Challenge:', props.currentChallenge);
 
-function handleReset() {
-  emit('reset', currentRecordIndex.value);
-}
-
-function backTomMenu() {
-  emit('back-to-menu');
-}
-
-function handleNextChallenge() {
-  emit('continue');
-}
-
-function handleNext() {
-  if (currentRecordIndex.value < totalRecords.value - 1) {
-    currentRecordIndex.value++;
-  } else if (props.feedback && props.feedback.success) {
-    handleNextChallenge();
-  }
-}
-
-function handlePrevious() {
-  if (currentRecordIndex.value > 0) {
-    currentRecordIndex.value--;
-  }
-}
-
-function updateUserData(newData) {
-  if (!newData || newData.length === 0 || !props.userCleanedData) return;
-
-  // Copy the updated item back to the full array
-  const updatedData = [...props.userCleanedData];
-  if (currentRecordIndex.value < updatedData.length && newData[0]) {
-    updatedData[currentRecordIndex.value] = newData[0];
-    emit('update:userCleanedData', updatedData);
-  }
-}
 </script>
 
 <template>

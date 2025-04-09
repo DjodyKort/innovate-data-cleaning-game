@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, defineEmits } from 'vue';
+import { defineProps, defineEmits, computed } from 'vue';
 
 const props = defineProps({
   item: {
@@ -22,6 +22,49 @@ const props = defineProps({
 
 const emit = defineEmits(['update:item']);
 
+// Enhanced function to strictly check for empty values
+const isNotEmpty = (value) => {
+  // Handle null, undefined
+  if (value === null || value === undefined) return false;
+
+  // Handle empty strings and whitespace - more strictly
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed === '' || trimmed === '-' || trimmed === '0') return false;
+  }
+
+  // Handle numeric zeros or values close to zero
+  if ((typeof value === 'number' && (value === 0 || Math.abs(value) < 0.00001)) || 
+      (typeof value === 'string' && (value === '0' || value === '-0'))) return false;
+
+  // Handle NaN values
+  if (typeof value === 'number' && isNaN(value)) return false;
+
+  // Handle empty objects
+  if (typeof value === 'object' && Object.keys(value).length === 0) return false;
+
+  return true;
+};
+
+// Improved computed property to filter fields
+const filteredFields = computed(() => {
+  console.log("Original item:", props.item); // Debug log
+  
+  const filtered = Object.entries(props.item)
+    .filter(([key, value]) => {
+      const keep = key !== 'id' && isNotEmpty(value);
+      console.log(`Field ${key}: ${value} (${typeof value}) - Keep: ${keep}`); // Debug log
+      return keep;
+    })
+    .reduce((obj, [key, value]) => {
+      obj[key] = value;
+      return obj;
+    }, {});
+    
+  console.log("Filtered fields:", filtered); // Debug log
+  return filtered;
+});
+
 // Function to handle input changes
 const updateField = (key, value) => {
   const updatedItem = { ...props.item, [key]: value };
@@ -41,21 +84,19 @@ const updateField = (key, value) => {
     <div class="data-id">ID: {{ item.id }}</div>
     <div
         class="data-field"
-        v-for="(value, key) in item"
+        v-for="(value, key) in filteredFields"
         :key="key"
     >
-      <template v-if="key !== 'id'">
-        <span>{{ key }}: </span>
-        <template v-if="editable">
-          <input
-              :value="item[key]"
-              @input="updateField(key, $event.target.value)"
-              :class="{'error-field': feedback && feedback.errors && feedback.errors.includes(key)}"
-          />
-        </template>
-        <template v-else>
-          {{ value }}
-        </template>
+      <span>{{ key }}: </span>
+      <template v-if="editable">
+        <input
+            :value="value"
+            @input="updateField(key, $event.target.value)"
+            :class="{'error-field': feedback && feedback.errors && feedback.errors.includes(key)}"
+        />
+      </template>
+      <template v-else>
+        {{ value }}
       </template>
     </div>
     <div

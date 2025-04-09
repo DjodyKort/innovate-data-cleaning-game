@@ -10,6 +10,7 @@ const {
     getAllChallenges,
     getChallengeDirtyData,
     getChallengeCleanData,
+    getChallengeDataById,
     getHighScores,
     insertHighScore,
     closeDatabase,
@@ -47,16 +48,22 @@ app.get('/api/challenge/:id', async (req, res) => {
 
     try {
         const dirtyData = await getChallengeDirtyData(challengeId);
+        const challengeData = await getChallengeDataById(challengeId);
 
         if (dirtyData.length === 0) {
+            return res.status(404).json({ error: "Challenge not found" });
+        }
+        if (challengeData.length === 0) {
             return res.status(404).json({ error: "Challenge not found" });
         }
 
         res.json({
             id: challengeId,
+            name: challengeData.name,
             dirtyData: dirtyData
         });
-    } catch (err) {
+    }
+    catch (err) {
         console.error(err);
         res.status(500).json({ error: "Database error" });
     }

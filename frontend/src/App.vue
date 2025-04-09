@@ -1,3 +1,7 @@
+Oké, hier is de volledige code van je App.vue component met de wijziging om het catclean icoon groter te maken (met een width van 5vw in de CSS class):
+
+HTML
+
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
@@ -193,12 +197,11 @@ onMounted(() => {
 });
 </script>
 
-<!-- ==== Template ==== -->
 <template>
   <div id="app">
     <div class="topBorder">
       <div class="imageTopRight">
-        <img src="" alt="logo-zuyd"/>
+        <img src="./assets/zuyd_logo.png" alt="logo-zuyd"/>
       </div>
       <div class="firstTopBorder">
       </div>
@@ -207,10 +210,18 @@ onMounted(() => {
     </div>
     <div v-if="!currentChallenge && !showHighScores && !showScoreSubmission">
       <div class="headers">
-        <h3><i>Lectoraat Data intelligence en ICT-Academie in samenwerking met</i></h3>
-        <hr/>
-        <h2>ChatGPTeam</h2>
-        <h1>Data Cleaning - ID Game</h1>
+        <h3 class="lectoraatText"><i>Lectoraat Data intelligence en ICT-Academie in samenwerking met</i></h3>
+        <div class="divvy"></div>
+        <div class="chatGPTeam">
+          <h2 class="chatGPTeamText" style="display: inline-block; margin-right: 0.5vw;">ChatGPTeam</h2>
+          <img
+            src="./assets/cat_clean_icon.png"
+            alt="logo-chatgpteam"
+            class="catCleanIcon"
+            style="display: inline-block; width: 7vw; height: auto; vertical-align: middle;"
+          />
+        </div>
+        <h1 class="idGameText">Data Cleaning - ID Game</h1>
       </div>
       <div class="buttons">
         <div class="start-game-container">
@@ -247,12 +258,109 @@ onMounted(() => {
   </div>
 </template>
 
-<!-- ==== Style ==== -->
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif; /*Jersey 10*/
+  /* max-width: 1200px;
+  margin: 0 auto; */
+  padding: 0px;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+}
+
+.imageTopRight {
+    position: absolute;
+    top: 2.3vh;
+    right: 2.3vw;
+    width: 10vw;
+    height: auto; /* 17.8vh */
+}
+
+.firstTopBorder {
+  width: 100vw;
+  height: 8.34vh;
+  z-index: 0;
+  background-color: #8D101F;
+}
+
+.secondTopBorder {
+  width: 100vw;
+  height: 5.55vh;
+  z-index: -1;
+  background-color: #ED1B34;
+}
+
+.headers {
+  text-align: center;
+  font-size: 4vw;
+}
+
+.lectoraatText {
+  margin-bottom: 3vh;
+  font-size: 2vw;
+}
+
+.divvy {
+  margin: auto;
+  width: 41.7vw;
+  height: 0.3vh;
+  border-radius: 50px;
+  background-color: black;
+}
+
+.chatGPTeam {
+  margin-top: 1.5vh;
+  position: relative;
+}
+
+.chatGPTeamText {
+  font-size: inherit;
+  margin-top: 0;
+  margin-right: 0.5vw; /* Ruimte tussen tekst en icoon */
+  display: inline-block; 
+}
+
+.catCleanIcon {
+  width: 5vw;
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.idGameText {
+  margin-top: 10vh;
+  margin-bottom: 5vh;
+  font-size: inherit;
+}
+
+.buttons {
+  display: block;
+  margin-top: 30px;
+}
+
+.buttons button {
+  font-family: "Jersey 10", sans-serif;
+  display: block;
+  width: 21vw;
+  height: 10vh;
+  font-size: 3.5vw;
+  padding: 12px 24px;
+  border-radius: 0.6vw;
+  border: solid #aaa;
+  border-bottom: 0.37vh solid #000000;
+  border-right: 0.2vw solid #000000;
+  border-left: 0.2vw inherit;
+  border-top: 0.37vh inherit;
+  cursor: pointer;
+  margin-bottom: 2.78vh;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #eddddb;
 }
 </style>
