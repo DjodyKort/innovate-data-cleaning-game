@@ -202,7 +202,7 @@ onMounted(() => {
         <img src="./assets/zuyd_logo.png" alt="logo-zuyd"/>
       </div>
       <div class="firstTopBorder">
-        <div v-if="currentChallenge || showHighScores || showScoreSubmission">
+        <div v-if="currentChallenge || showHighScores || showScoreSubmission || showInfoPage">
           <button @click="backToMenu" class="exit-button home-button">
             <img src="@/assets/home.svg" alt="Home" class="home-icon">
           </button>
@@ -390,10 +390,6 @@ body {
 .info-btn {
   background-color: #8D101F;
   color: black;
-}
-
-.info-btn:hover {
-  background-color: #6d0c19;
 }
 
 </style>

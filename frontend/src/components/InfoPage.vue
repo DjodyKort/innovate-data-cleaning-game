@@ -61,10 +61,6 @@ function handleBackToMenu() {
         Adres: Zuyd Hogeschool, Nieuw Eyckholt 300, 6419 DJ Heerlen
       </p>
     </div>
-
-    <div class="action-buttons">
-      <button @click="handleBackToMenu" class="back-btn">Terug naar Menu</button>
-    </div>
   </div>
 </template>
 
