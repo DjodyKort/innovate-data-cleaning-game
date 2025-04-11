@@ -8,11 +8,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['continue']);
 
-function handleContinue() {
-  emit('continue');
-}
 </script>
 
 <template>
@@ -22,7 +18,7 @@ function handleContinue() {
       Score: {{ feedback.score }} / {{ feedback.totalPossible }}
       ({{ feedback.percentage }}%)
     </div>
-    <button @click="handleContinue" class="continue-btn">Continue to Next Challenge</button>
+
   </div>
 </template>
 
@@ -40,17 +36,5 @@ function handleContinue() {
   margin-bottom: 20px;
 }
 
-.continue-btn {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
 
-.continue-btn:hover {
-  background-color: #45a049;
-}
 </style>

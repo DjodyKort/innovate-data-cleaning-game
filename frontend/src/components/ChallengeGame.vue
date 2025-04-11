@@ -1,52 +1,10 @@
 <script setup>
-// ==== Imports ====
 import { defineProps, defineEmits, ref, computed, watch } from 'vue';
 import DataColumn from './DataColumn.vue';
 import ResultsFeedback from './ResultsFeedback.vue';
+import InfoPopup from './InfoPopup.vue';
 
-// ==== Functions ====
-function handleSubmit() {
-  emit('submit');// Don't pass the index parameter to submit all records
-}
 
-function handleReset() {
-  emit('reset', currentRecordIndex.value);
-}
-
-function backTomMenu() {
-  emit('back-to-menu');
-}
-
-function handleNextChallenge() {
-  emit('continue');
-}
-
-function handleNext() {
-  if (currentRecordIndex.value < totalRecords.value - 1) {
-    currentRecordIndex.value++;
-  } else if (props.feedback && props.feedback.success) {
-    handleNextChallenge();
-  }
-}
-
-function handlePrevious() {
-  if (currentRecordIndex.value > 0) {
-    currentRecordIndex.value--;
-  }
-}
-
-function updateUserData(newData) {
-  if (!newData || newData.length === 0 || !props.userCleanedData) return;
-
-  // Copy the updated item back to the full array
-  const updatedData = [...props.userCleanedData];
-  if (currentRecordIndex.value < updatedData.length && newData[0]) {
-    updatedData[currentRecordIndex.value] = newData[0];
-    emit('update:userCleanedData', updatedData);
-  }
-}
-
-// ==== Declaring Variables ====
 const props = defineProps({
   currentChallenge: {
     type: Object,
@@ -70,16 +28,15 @@ const props = defineProps({
   }
 });
 
-// Keep track of which record we're currently on
 const currentRecordIndex = ref(0);
 const totalRecords = computed(() => props.userCleanedData?.length || 0);
 
-// Flag to check if all challenges are completed
 const isLastChallenge = computed(() => props.gameNumber === props.totalGames);
 
-const emit = defineEmits(['submit', 'reset', 'back-to-menu', 'continue', 'update:userCleanedData', 'update:finalScore']);
+const emit = defineEmits(['submit', 'reset', 'continue', 'update:userCleanedData', 'update:finalScore']);
 
-// Computed properties to filter data to just the current record with additional checks
+let submitClicked = ref(false);
+
 const currentDirtyData = computed(() => {
   if (!props.currentChallenge?.dirtyData ||
       currentRecordIndex.value >= props.currentChallenge.dirtyData.length) {
@@ -99,25 +56,59 @@ const currentUserData = computed(() => {
 const currentFeedback = computed(() => {
   if (!props.feedback || !props.feedback.results) return null;
 
-  // Check if the current index is valid
   if (currentRecordIndex.value >= props.feedback.results.length) {
     return { ...props.feedback, results: [] };
   }
 
-  // Create a copy of the feedback but only include the current record's results
   const filteredFeedback = {...props.feedback};
   filteredFeedback.results = [filteredFeedback.results[currentRecordIndex.value]];
   return filteredFeedback;
 });
 
-// ==== Watchers ====
-// Update the challenge score when feedback changes
+function handleSubmit() {
+  submitClicked = true;
+  emit('submit');
+}
+
+function handleReset() {
+  submitClicked = false;
+  currentRecordIndex.value = 0;
+  emit('reset', currentRecordIndex.value);
+}
+
+function handleNextChallenge() {
+  submitClicked = false;
+  emit('continue');
+}
+
+function handleNext() {
+  if (currentRecordIndex.value < totalRecords.value - 1) {
+    currentRecordIndex.value++;
+  } else if (props.feedback && props.feedback.success) {
+    handleNextChallenge();
+  }
+}
+
+function handlePrevious() {
+  if (currentRecordIndex.value > 0) {
+    currentRecordIndex.value--;
+  }
+}
+
+function updateUserData(newData) {
+  if (!newData || newData.length === 0 || !props.userCleanedData) return;
+
+  const updatedData = [...props.userCleanedData];
+  if (currentRecordIndex.value < updatedData.length && newData[0]) {
+    updatedData[currentRecordIndex.value] = newData[0];
+    emit('update:userCleanedData', updatedData);
+  }
+}
+
 watch(
     () => props.feedback,
     (newFeedback) => {
       if (newFeedback && newFeedback.results && newFeedback.success) {
-        // Just notify the parent component that this challenge is completed successfully
-        // The parent will handle scoring
         if (isLastChallenge.value) {
           emit('continue');
         }
@@ -125,26 +116,23 @@ watch(
     }
 );
 
-// Reset the current record index when challenge changes
 watch(
     () => props.currentChallenge?.id,
     () => {
       currentRecordIndex.value = 0;
     }
 );
-
-// ==== Start of Component ====
-console.log('Current Challenge:', props.currentChallenge);
-
 </script>
 
 <template>
   <div class="game-container">
-    <button @click="backTomMenu" class="exit-button">
-      Exit Challenge
-    </button>
+    
     <div class="challenge-header">
-      <h2>Challenge {{ currentChallenge.id }}: {{ currentChallenge.name }}</h2>
+
+      <div class="title-with-info">
+        <h2>Challenge {{ currentChallenge.id }}: {{ currentChallenge.name }}</h2>
+        <InfoPopup :description="currentChallenge.description" />
+      </div>
       <div class="progress-indicator">
         Challenge {{ gameNumber }} of {{ totalGames }}
       </div>
@@ -153,22 +141,23 @@ console.log('Current Challenge:', props.currentChallenge);
       </div>
     </div>
 
-    <!-- Only render data columns if we have valid data -->
     <div v-if="currentDirtyData.length > 0 && currentUserData.length > 0" class="data-container">
-      <!-- Original Data Column -->
-      <DataColumn
+      <div class="column">
+        <DataColumn
           title="Original Data"
           :data="currentDirtyData"
           :editable="false"
-      />
-      <!-- User's Cleaned Data Column -->
-      <DataColumn
+        />
+      </div>
+      <div class="column">
+        <DataColumn
           title="Clean the Data"
           :data="currentUserData"
           :editable="true"
           :feedback="currentFeedback"
           @update:data="updateUserData"
-      />
+        />
+      </div>
     </div>
     <div v-else class="loading">
       Loading data...
@@ -176,90 +165,148 @@ console.log('Current Challenge:', props.currentChallenge);
 
     <div class="controls">
       <button
-          v-if="currentRecordIndex > 0"
-          @click="handlePrevious"
-          class="previous-btn"
-          :disabled="currentRecordIndex === 0"
+        v-if="currentRecordIndex > 0"
+        @click="handlePrevious"
+        class="previous-btn"
+        :disabled="currentRecordIndex === 0"
       >
         Previous Record
       </button>
       <button @click="handleReset" class="reset-btn">Reset</button>
       <button
-          v-if="currentRecordIndex < totalRecords - 1 || (feedback && feedback.success)"
-          @click="handleNext"
-          class="continue-btn"
+        v-if="currentRecordIndex < totalRecords - 1 || (feedback && feedback.success)"
+        @click="handleNext"
+        class="continue-btn"
       >
         {{ currentRecordIndex < totalRecords - 1 ? 'Next Record' : 'Continue to Next Challenge' }}
       </button>
       <button
-          v-else
-          @click="handleSubmit"
-          class="submit-btn"
-          :disabled="feedback && feedback.success">Submit
+        v-else-if="!submitClicked && currentRecordIndex === totalRecords - 1"
+        @click="handleSubmit"
+        class="submit-btn"
+        :disabled="feedback && feedback.success"
+      >
+        Submit
       </button>
+      <button
+        v-if="submitClicked"
+        @click="handleNextChallenge"
+        class="continue-btn">Continue to Next Challenge</button>
     </div>
     <ResultsFeedback
-        v-if="feedback"
-        :feedback="feedback"
-        :showScore="false"
-        @continue="handleNextChallenge"
+      v-if="feedback"
+      :feedback="feedback"
+      :showScore="false"
+      @continue="handleNextChallenge"
     />
   </div>
 </template>
 
 <style scoped>
+
+
 .game-container {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 20px;
 }
-.challenge-header {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+
+.challenge-header h2 {
+  font-size: 4vh;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+  text-transform: uppercase;
+  margin-bottom: 0.5vh;
 }
+
+.progress-indicator {
+  font-size: 2.5vh;
+}
+
+.record-indicator {
+  font-size: 2vh;
+  color: #666;
+  margin-top: 5px;
+}
+
 .data-container {
   display: flex;
-  gap: 40px;
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 20px;
+  font-size: 1vw;
 }
+
+.column {
+  flex: 1;
+  padding: 10px;
+  min-width: 20vw;
+  line-height: 3vh;
+  text-align: left;
+}
+
 .controls {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 15px;
   margin: 20px 0;
+  flex-wrap: wrap;
+  width: 100%;
 }
-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+
+button:hover {
+  transform: scale(1.05);
 }
+
 .submit-btn {
   background-color: #2196F3;
   color: white;
 }
+
 .reset-btn {
   background-color: #ff9800;
   color: white;
 }
+
 .previous-btn {
   background-color: #9e9e9e;
   color: white;
 }
+
 .continue-btn {
   background-color: #4CAF50;
   color: white;
 }
-.record-indicator {
-  font-size: 16px;
-  color: #666;
-  margin-top: 5px;
+
+button {
+    font-size: 1.2rem;
+    padding: 14px 28px;
+    border-radius: 8px;
 }
-.exit-button {
-  align-self: flex-start;
-  background-color: #f44336;
-  color: white;
-  margin-bottom: 10px;
+
+.title-with-info {
+  display: flex;
+  align-items: center;
+
+  justify-content: center;
+  flex-wrap: wrap; 
+}
+
+.title-with-info h2 {
+  margin: 0;
+}
+
+
+@media (max-width: 768px) {
+  button {
+    font-size: 1.2rem;
+    padding: 14px 28px;
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 </style>

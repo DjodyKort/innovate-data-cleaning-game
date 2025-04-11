@@ -1,13 +1,11 @@
 <script setup>
-import { ref, onMounted, defineEmits } from 'vue';
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 const API_URL = process.env.VUE_APP_API_URL;
 const highScores = ref([]);
 const loading = ref(true);
 const error = ref(null);
-
-const emit = defineEmits(['back-to-menu']);
 
 async function fetchHighScores() {
   loading.value = true;
@@ -24,10 +22,6 @@ async function fetchHighScores() {
   }
 }
 
-function backToMenu() {
-  emit('back-to-menu');
-}
-
 onMounted(() => {
   fetchHighScores();
 });
@@ -35,10 +29,6 @@ onMounted(() => {
 
 <template>
   <div class="highscores-container">
-    <button @click="backToMenu" class="exit-button home-button">
-      <img src="@/assets/homebutton.png" alt="Home" class="home-icon">
-    </button>
-
     <h1 class="highScores">High Scores</h1>
 
     <div v-if="loading" class="loading-container">
@@ -80,10 +70,12 @@ onMounted(() => {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  
+  font-size: 2vh;
 }
 
 .highscores-container {
-  max-width: 800px;
+  max-width: 41.6vw;
   margin: 0 auto;
   padding: 20px;
   display: flex;
@@ -93,15 +85,15 @@ onMounted(() => {
 
 .highScores {
   font-size: 2.5rem;
-  margin-bottom: 30px;
+  margin-bottom: 2.78vh;
   text-align: center;
   color: #333;
 }
 
 .exit-button {
   font-family: "Sixtyfour", sans-serif;
-  width: 200px;
-  height: 40px;
+  width: 10.4vw;
+  height: 3.7vh;
   font-size: 20px;
   padding: 12px 24px;
   cursor: pointer;
@@ -111,31 +103,15 @@ onMounted(() => {
 }
 
 
-.home-button {
-  position: absolute;
-  top: 8px;
-  left: 20px;
-  z-index: 10; 
-  padding: 8px 16px;
-  background-color: transparent;
-  border: none;
-  border-bottom: none;
-  border-right: none;
-}
-
-.home-icon {
-  width: 48px;
-  height: 48px;
-  margin-right: 8px; 
-}
-
 .scores-table-container {
   width: 100%;
+  max-width: 80vw;
   overflow-x: auto;
 }
 
 .scores-table {
-  width: 100%;
+  width: auto;
+  min-width: 600px;
   border-collapse: collapse;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -160,10 +136,6 @@ onMounted(() => {
   background-color: #ffffff;
 }
 
-.scores-table tr:hover {
-  background-color: #f0f0f0;
-}
-
 .rank-header, .player-header, .score-header {
   padding: 12px 15px;
   text-transform: uppercase;
@@ -171,18 +143,19 @@ onMounted(() => {
 }
 
 .rank-cell, .rank-header {
-  width: 80px;
+  width: 5vw;
   text-align: center;
 }
 
 .player-cell, .player-header {
+  width: 40vw;
   text-align: left;
 }
 
 .score-cell, .score-header {
   font-weight: bold;
   text-align: right;
-  width: 120px;
+  width: 10vw;
 }
 
 .loading-container {

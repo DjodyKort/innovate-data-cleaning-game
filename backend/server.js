@@ -50,16 +50,15 @@ app.get('/api/challenge/:id', async (req, res) => {
         const dirtyData = await getChallengeDirtyData(challengeId);
         const challengeData = await getChallengeDataById(challengeId);
 
-        if (dirtyData.length === 0) {
-            return res.status(404).json({ error: "Challenge not found" });
-        }
-        if (challengeData.length === 0) {
+        if (dirtyData.length === 0 || !challengeData) {
             return res.status(404).json({ error: "Challenge not found" });
         }
 
         res.json({
             id: challengeId,
             name: challengeData.name,
+            description: challengeData.description, // Include the description
+            difficulty: challengeData.difficulty,   // Optionally include difficulty as well
             dirtyData: dirtyData
         });
     }

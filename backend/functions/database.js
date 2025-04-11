@@ -363,7 +363,7 @@ async function addChallenge1() {
     const challengeId = 1;
     const name = "Data Validity";
     const difficulty = "Easy";
-    const description = "Fix simple text errors like spelling mistakes in names and email addresses";
+    const description = "Fix simpele tekstfouten zoals spelfouten in namen en e-mailadressen. Corrigeer verkeerd gespelde woorden en typfouten om de gegevens nauwkeurig te maken.<br><br>('jan.j@hotmal.com' → 'jan.j@hotmail.com')";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
@@ -372,8 +372,6 @@ async function addChallenge1() {
         { name: "Jan Janssen", email: "jan.j@hotmail.com", phone: "0612345678" },
         { name: "Maria de Vries", email: "maria.vries@gmail.com", phone: "06-87654321" },
         { name: "Pieter Pietersen", email: "p.pietersen@bedrijf.nl", phone: "0698765432" },
-        { name: "Annelies Bakker", email: "a.bakker@provider.net", phone: "06 11223344" },
-        { name: "Mohammed Benali", email: "m.benali@yahoo.com", phone: "0655667788" }
     ];
 
     // Dirty data with spelling mistakes and errors
@@ -381,8 +379,6 @@ async function addChallenge1() {
         { name: "Jan Jnsen", email: "jan.j@hotmal.com", phone: "0612345678" },
         { name: "Maria de Vreis", email: "maria.vreis@gmil.com", phone: "06-87654321" },
         { name: "Piter Pietersen", email: "p.pietersen@bedirjf.nl", phone: "069875432" },
-        { name: "Annelies Bakker", email: "a.bakker@providr.net", phone: "06 11223344" },
-        { name: "Mohammed Benali", email: "m.benali@yaho.com", phone: "0655667789" }
     ];
 
     // Insert data
@@ -397,24 +393,21 @@ async function addChallenge2() {
     const challengeId = 2;
     const name = "Data Type Validation";
     const difficulty = "Medium";
-    const description = "Convert text values to their proper data types";
+    const description = "Converteer tekstwaarden naar het juiste gegevenstype (bijvoorbeeld 'Twaalf' → 12).";
+
 
     await insertChallenge(challengeId, name, difficulty, description);
 
     const cleanData = [
         { leeftijd: 12 },
-        { prijs: 19.95 },
-        { klantid: "1138", productcode: "A4-XYZ" },
-        { postcode: "1234 AB" },
-        { geboortedatum: "17-04-1990", gewicht_kg: 75.5 }
+        { name: "Annelies Bakker", email: "a.bakker@provider.net", phone: "06 11223344" },
+        { name: "Mohammed Benali", email: "m.benali@yahoo.com", phone: "0655667788" }
     ];
 
     const dirtyData = [
         { leeftijd: "Twaalf" },
-        { prijs: "€ 19,95" },
-        { klantid: "K1138", productcode: "4" },
-        { postcode: "1234 AB " },
-        { geboortedatum: "1990-04-17", gewicht_kg: "75,5 kg" }
+        { name: "Annelies Bakker", email: "a.bakker@providr.net", phone: "06 11223344" },
+        { name: "Mohammed Benali", email: "m.benali@yaho.com", phone: "0655667789" }
     ];
 
     // Insert data
@@ -429,24 +422,21 @@ async function addChallenge3() {
     const challengeId = 3;
     const name = "Data Standardization";
     const difficulty = "Medium";
-    const description = "Standardize data formats like capitalization and country codes";
+    const description = "Standaardiseer gegevensformaten zoals hoofdlettergebruik en landcodes. Zorg ervoor dat alle gegevens een consistente notatie volgen voor betere leesbaarheid en verwerking.<br><br>('jan' → 'Jan') en landcodes ('Nederland' → 'NL')";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
     const cleanData = [
         { voornaam: "Jan", achternaam: "de Vries" },
-        { name: "Piet Janssen" },
         { land: "NL" },
         { telefoonmobiel: "+31611223344", telefoonvast: "+31105551212" },
-        { actief: 1, nieuwsbrief: 0 }
     ];
 
     const dirtyData = [
         { voornaam: "jan", achternaam: "DE VRIES" },
-        { name: "PIET JANSSEN" },
         { land: "Nederland" },
         { telefoonmobiel: "06-11223344", telefoonvast: "010-555 12 12" },
-        { actief: "TRUE", nieuwsbrief: "Nee" }
+
     ];
 
     for (let i = 0; i < cleanData.length; i++) {
@@ -460,24 +450,20 @@ async function addChallenge4() {
     const challengeId = 4;
     const name = "Missing Data Handling";
     const difficulty = "Hard";
-    const description = "Fill in missing fields based on context";
+    const description = "Vul ontbrekende velden aan op basis van context of geldende regels. Gebruik de beschikbare gegevens om ontbrekende informatie logisch in te vullen, of geef expliciet 'onbekend' aan als de informatie niet afgeleid kan worden.<br><br>(bijvoorbeeld het netnummer uit een telefoonnummer)";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
     const cleanData = [
         { voornaam: "Fatima", achternaam: "Yilmaz", volledigenaam: "Fatima Yilmaz" },
         { straat: "Dorpsstraat 1", postcode: "1234 AB", woonplaats: "Dorpshuizen", land: "NL" },
-        { postcode: "3011 AC", woonplaats: "Rotterdam" },
         { telefoonnummer: "+31101234567", netnummer: "010" },
-        { productid: "XYZ", prijsperstuk: 15.50, aantal: 4, totaalprijs: 62.00 }
     ];
 
     const dirtyData = [
         { voornaam: "Fatima", achternaam: "Yilmaz", volledigenaam: null },
         { straat: "Dorpsstraat 1", postcode: "1234 AB", woonplaats: "Dorpshuizen", land: null },
-        { postcode: "3011 AC", woonplaats: null },
         { telefoonnummer: "+31101234567", netnummer: null },
-        { productid: "XYZ", prijsperstuk: 15.50, aantal: 4, totaalprijs: null }
     ];
 
     for (let i = 0; i < cleanData.length; i++) {
@@ -491,24 +477,20 @@ async function addChallenge5() {
     const challengeId = 5;
     const name = "Structural Validation";
     const difficulty = "Hard";
-    const description = "Fix data with structural problems like swapped fields";
+    const description = "Corrigeer structurele problemen zoals verwisselde velden. Verplaats gegevens naar de juiste velden wanneer informatie in verkeerde kolommen is geplaatst<br><br>(bijvoorbeeld voornaam en achternaam omdraaien).";
 
     await insertChallenge(challengeId, name, difficulty, description);
 
     const cleanData = [
         { voornaam: "Willem", achternaam: "de Boer", email: "w.deboer@mail.com" },
-        { adres: "Damrak 1", postcode: "1011 AA", woonplaats: "Amsterdam", phone: "+31698765432" },
         { klantid: "5678", stad: "Brussel", land: "BE" },
         { name: "Stichting Voorbeeld", email: "info@company.org", contactpersoon: "Mevr. Jansen" },
-        { productid: "PROD-001", aantal: 3, prijsperstuk: 49.95 }
     ];
 
     const dirtyData = [
         { voornaam: "de Boer", achternaam: "Willem", email: "w.deboer@mail.com" },
-        { adres: "+31698765432", postcode: "1011 AA", woonplaats: "Amsterdam", phone: "Damrak 1" },
         { klantid: "5678", stad: "België", land: "Brussel" },
         { name: "info@company.org", email: "Stichting Voorbeeld", contactpersoon: "Mevr. Jansen" },
-        { productid: "PROD-001", aantal: 49.95, prijsperstuk: 3 }
     ];
 
     for (let i = 0; i < cleanData.length; i++) {

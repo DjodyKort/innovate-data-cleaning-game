@@ -1,18 +1,17 @@
-Oké, hier is de volledige code van je App.vue component met de wijziging om het catclean icoon groter te maken (met een width van 5vw in de CSS class):
-
-HTML
-
 <script setup>
+// ==== Imports ====
 import { ref, onMounted, computed } from 'vue';
 import axios from 'axios';
 import ChallengeGame from './components/ChallengeGame.vue';
 import HighScores from "./components/HighScores.vue";
 import GameScoreSubmission from "./components/GameScoreSubmission.vue";
+import InfoPage from "./components/InfoPage.vue";
 
-// Constants
+// ==== Declaring Variables ====
+// Environment variables
 const API_URL = process.env.VUE_APP_API_URL
 
-// Reactive state
+/// Consts
 const availableChallenges = ref([]);
 const currentChallengeIndex = ref(0);
 const currentChallenge = ref(null);
@@ -25,22 +24,21 @@ const gameCompleted = ref(false);
 const finalScore = ref(0);
 const challengeScores = ref({});
 const gameScore = ref(0);
+const showInfoPage = ref(false);
 
-// Computed
+
 const currentGameNumber = computed(() => {
   if (!gameInProgress.value) return 0;
   return currentChallengeIndex.value + 1;
 });
-
 const totalGames = computed(() => {
   return availableChallenges.value.length;
 });
-
 const totalScore = computed(() => {
   return Object.values(challengeScores.value).reduce((sum, score) => sum + score, 0);
 });
 
-// Functions
+
 async function fetchChallenges() {
   try {
     const response = await axios.get(`${API_URL}/challenges`);
@@ -76,7 +74,6 @@ async function loadCurrentChallenge() {
 
 async function submitData(recordIndex) {
   try {
-    // If recordIndex is provided, create a payload with just that record
     const dataToSubmit = recordIndex !== undefined
         ? { cleanedData: [userCleanedData.value[recordIndex]] }
         : { cleanedData: userCleanedData.value };
@@ -87,12 +84,10 @@ async function submitData(recordIndex) {
     );
     feedback.value = response.data;
 
-    // Calculate and store score for this challenge
     if (feedback.value) {
       const challengeId = currentChallenge.value.id;
       challengeScores.value[challengeId] = calculateChallengeScore(feedback.value);
 
-      // Update the final game score
       gameScore.value = totalScore.value;
     }
 
@@ -141,7 +136,6 @@ function advanceToNextGame() {
   currentChallengeIndex.value++;
   feedback.value = null; // Reset feedback when moving to next challenge
 
-  // If we've completed all challenges
   if (currentChallengeIndex.value >= availableChallenges.value.length) {
     gameInProgress.value = false;
     gameCompleted.value = true;
@@ -151,19 +145,16 @@ function advanceToNextGame() {
     return;
   }
 
-  // Load the next challenge
   loadCurrentChallenge();
 }
 
 function resetChallenge(recordIndex) {
   if (currentChallenge.value) {
     if (recordIndex !== undefined) {
-      // Reset only the specific record
       userCleanedData.value[recordIndex] = JSON.parse(
           JSON.stringify(currentChallenge.value.dirtyData[recordIndex])
       );
     } else {
-      // Reset all records
       userCleanedData.value = JSON.parse(
           JSON.stringify(currentChallenge.value.dirtyData)
       );
@@ -177,10 +168,17 @@ function showHighScoresScreen() {
   showScoreSubmission.value = false;
 }
 
+function showInfoPageScreen() {
+  showInfoPage.value = true;
+  showHighScores.value = false;
+  showScoreSubmission.value = false;
+}
+
 function backToMenu() {
   currentChallenge.value = null;
   showHighScores.value = false;
   showScoreSubmission.value = false;
+  showInfoPage.value = false;
   gameInProgress.value = false;
 }
 
@@ -204,11 +202,16 @@ onMounted(() => {
         <img src="./assets/zuyd_logo.png" alt="logo-zuyd"/>
       </div>
       <div class="firstTopBorder">
+        <div v-if="currentChallenge || showHighScores || showScoreSubmission">
+          <button @click="backToMenu" class="exit-button home-button">
+            <img src="@/assets/home.svg" alt="Home" class="home-icon">
+          </button>
+        </div>
       </div>
       <div class="secondTopBorder">
       </div>
     </div>
-    <div v-if="!currentChallenge && !showHighScores && !showScoreSubmission">
+    <div v-if="!currentChallenge && !showHighScores && !showScoreSubmission && !showInfoPage">
       <div class="headers">
         <h3 class="lectoraatText"><i>Lectoraat Data intelligence en ICT-Academie in samenwerking met</i></h3>
         <div class="divvy"></div>
@@ -227,6 +230,7 @@ onMounted(() => {
         <div class="start-game-container">
           <button @click="startGame" class="start-game-btn">Start Game</button>
           <button @click="showHighScoresScreen" class="high-scores-btn">High Scores</button>
+          <button @click="showInfoPageScreen" class="info-btn">Lectoraat</button>
         </div>
       </div>
     </div>
@@ -253,6 +257,9 @@ onMounted(() => {
     />
     <HighScores
         v-else-if="showHighScores"
+    />
+    <InfoPage
+        v-else-if="showInfoPage"
         @back-to-menu="backToMenu"
     />
   </div>
@@ -288,6 +295,22 @@ body {
   background-color: #8D101F;
 }
 
+.home-button {
+  position: absolute;
+  top: 1vw;
+  left: 1.04vw;
+  z-index: 10;
+  background-color: transparent;
+  border: none;
+  border-bottom: none;
+  border-right: none;
+}
+
+.home-icon {
+  width: 2.5vw;
+  height: 4.44vh;
+}
+
 .secondTopBorder {
   width: 100vw;
   height: 5.55vh;
@@ -321,8 +344,8 @@ body {
 .chatGPTeamText {
   font-size: inherit;
   margin-top: 0;
-  margin-right: 0.5vw; /* Ruimte tussen tekst en icoon */
-  display: inline-block; 
+  margin-right: 0.5vw;
+  display: inline-block;
 }
 
 .catCleanIcon {
@@ -363,4 +386,14 @@ body {
   margin-right: auto;
   background-color: #eddddb;
 }
+
+.info-btn {
+  background-color: #8D101F;
+  color: black;
+}
+
+.info-btn:hover {
+  background-color: #6d0c19;
+}
+
 </style>
