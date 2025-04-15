@@ -228,7 +228,7 @@ function createTablesIfNotExist() {
                                                           woonplaats TEXT,
                                                           stad TEXT,
                                                           land TEXT,
-                                                          leeftijd INTEGER,
+                                                          leeftijd TEXT,
                                                           prijs REAL,
                                                           klantid TEXT,
                                                           productcode TEXT,
@@ -369,7 +369,7 @@ async function addChallenge1() {
 
     // Clean data
     const cleanData = [
-        { name: "Jan Janssen", email: "jan.j@hotmail.com", phone: "0612345678" },
+        { name: "Jan Jansen", email: "jan.j@hotmail.com", phone: "0612345678" },
         { name: "Maria de Vries", email: "maria.vries@gmail.com", phone: "06-87654321" },
         { name: "Pieter Pietersen", email: "p.pietersen@bedrijf.nl", phone: "0698765432" },
     ];
@@ -399,7 +399,7 @@ async function addChallenge2() {
     await insertChallenge(challengeId, name, difficulty, description);
 
     const cleanData = [
-        { leeftijd: 12 },
+        { leeftijd: "12" },
         { name: "Annelies Bakker", email: "a.bakker@provider.net", phone: "06 11223344" },
         { name: "Mohammed Benali", email: "m.benali@yahoo.com", phone: "0655667788" }
     ];
@@ -461,9 +461,9 @@ async function addChallenge4() {
     ];
 
     const dirtyData = [
-        { voornaam: "Fatima", achternaam: "Yilmaz", volledigenaam: null },
-        { straat: "Dorpsstraat 1", postcode: "1234 AB", woonplaats: "Dorpshuizen", land: null },
-        { telefoonnummer: "+31101234567", netnummer: null },
+        { voornaam: "Fatima", achternaam: "Yilmaz", volledigenaam: "F" },
+        { straat: "Dorpsstraat 1", postcode: "1234 AB", woonplaats: "Dorpshuizen", land: "N" },
+        { telefoonnummer: "+31101234567", netnummer: "a" },
     ];
 
     for (let i = 0; i < cleanData.length; i++) {
