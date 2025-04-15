@@ -90,8 +90,6 @@ async function submitData(recordIndex) {
 
       gameScore.value = totalScore.value;
     }
-
-    console.log(feedback.value);
   } catch (error) {
     console.error('Error submitting data:', error);
   }
@@ -118,17 +116,10 @@ function calculateChallengeScore(feedback) {
       const errorCount = result.errors.length;
       const totalPenalty = errorCount * errorPenalty;
       recordScore = Math.max(0, recordScore - totalPenalty);
-      console.log(`Record score after penalty: ${recordScore}`);
-    } else if (result.correct) {
-      console.log('Record is correct, no penalties applied');
     }
-
-    const newSum = sum + recordScore;
-    console.log(`Adding ${recordScore} to running total. New sum: ${newSum}`);
-    return newSum;
+    return sum + recordScore;
   }, 0);
 
-  console.log('Final challenge score calculated:', totalScore);
   return totalScore;
 }
 
