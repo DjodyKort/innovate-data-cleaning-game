@@ -370,7 +370,7 @@ async function addChallenge1() {
     // Clean data
     const cleanData = [
         { name: "Jan Jansen", email: "jan.j@hotmail.com", phone: "0612345678" },
-        { name: "Maria de Vries", email: "maria.vries@gmail.com", phone: "06-87654321" },
+        { name: "Maria de Vries", email: "maria.vries@gmail.com", phone: "0687654321" },
         { name: "Pieter Pietersen", email: "p.pietersen@bedrijf.nl", phone: "0698765432" },
     ];
 
@@ -378,7 +378,7 @@ async function addChallenge1() {
     const dirtyData = [
         { name: "Jan Jnsen", email: "jan.j@hotmal.com", phone: "0612345678" },
         { name: "Maria de Vreis", email: "maria.vreis@gmil.com", phone: "06-87654321" },
-        { name: "Piter Pietersen", email: "p.pietersen@bedirjf.nl", phone: "069875432" },
+        { name: "Piter Pietersen", email: "p.pietersen@bedirjf.nl", phone: "0698765432" },
     ];
 
     // Insert data
@@ -400,14 +400,14 @@ async function addChallenge2() {
 
     const cleanData = [
         { leeftijd: "12" },
-        { name: "Annelies Bakker", email: "a.bakker@provider.net", phone: "06 11223344" },
+        { name: "Annelies Bakker", email: "a.bakker@provider.net", phone: "0611223344" },
         { name: "Mohammed Benali", email: "m.benali@yahoo.com", phone: "0655667788" }
     ];
 
     const dirtyData = [
         { leeftijd: "Twaalf" },
         { name: "Annelies Bakker", email: "a.bakker@providr.net", phone: "06 11223344" },
-        { name: "Mohammed Benali", email: "m.benali@yaho.com", phone: "0655667789" }
+        { name: "Mohammed Benali", email: "m.benali@yaho.com", phone: "0655667788" }
     ];
 
     // Insert data
@@ -457,13 +457,13 @@ async function addChallenge4() {
     const cleanData = [
         { voornaam: "Fatima", achternaam: "Yilmaz", volledigenaam: "Fatima Yilmaz" },
         { straat: "Dorpsstraat 1", postcode: "1234 AB", woonplaats: "Dorpshuizen", land: "NL" },
-        { telefoonnummer: "+31101234567", netnummer: "010" },
+        { telefoonnummer: "+31101234567", netnummer: "onbekend" },
     ];
 
     const dirtyData = [
         { voornaam: "Fatima", achternaam: "Yilmaz", volledigenaam: "F" },
         { straat: "Dorpsstraat 1", postcode: "1234 AB", woonplaats: "Dorpshuizen", land: "N" },
-        { telefoonnummer: "+31101234567", netnummer: "a" },
+        { telefoonnummer: "+31101234567", netnummer: "0" },
     ];
 
     for (let i = 0; i < cleanData.length; i++) {
