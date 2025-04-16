@@ -1,5 +1,4 @@
-Om de services te runnen moet je eerst de node packages installen, er zijn 3 verschillende 
-1. In de main Directory
+Om de services te runnen moet je eerst de node packages installen, er zijn 2 verschillende Directorys
 2. Frontend
 3. Backend
 
