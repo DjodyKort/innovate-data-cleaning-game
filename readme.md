@@ -99,4 +99,5 @@ data-cleaning-game/
 
 Djody Kort - [LinkedIn Profiel](https://www.linkedin.com/in/djody-kort/)\
 Dinand Nafzger - [LinkedIn Profiel](https://www.linkedin.com/in/dinand-nafzger-3a1ab0241/)\
-Martijn Theeuwen - [LinkedIn Profiel](https://www.linkedin.com/in/martijn-theeuwen/)
+Martijn Theeuwen - [LinkedIn Profiel](https://www.linkedin.com/in/martijn-theeuwen/)\
+Luca Bosch - [LinkedIn Profiel](https://www.linkedin.com/in/luca-bosch-69b26132a/)\
